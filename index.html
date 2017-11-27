@@ -6,14 +6,39 @@
     <style type="text/css">
 
       #canvas{background-color: #000;}
-
+      .header {
+        display: inline-block; 
+        width: 100%;
+      }
+      .playerOne {
+        float: left;
+        color: #00FF00;
+        margin-left: auto;
+        margin-right: auto; 
+      }
+      .playerTwo {
+        float: right;
+        color: #ff0000;
+        margin-left: auto;
+        margin-right: auto; 
+      }
     </style>
   </head>
 
 <body bgcolor="#000000" text="#FFFFFF" style="text-align: center" onLoad="startGame()">
 <h1>Autopilot AI Game Prototype</h1>
-<p style="text-align: center;"><canvas id="gameSpace" width="1000" height="500" style="border:1px solid #FFFFFF;">This game only works in modern browsers that support Canvas.</canvas></p>
+<div class="header">
+  <div class="playerOne">
+    Your Ships
+  </div>
+  <div class="playerTwo">
+    Enemy Ships
+  </div>
+</div><p style="text-align: center;"><canvas id="gameSpace" width="1000" height="500" style="border:1px solid #FFFFFF;">This game only works in modern browsers that support Canvas.</canvas></p>
 <p style="margin-left: auto; margin-right: auto; text-align: center"><span id='statusSpan'></span></p>
+<p><br/>If you do nothing, you will lose by default. To win you must click on the battlefield to strategically attack the enemy ships. 
+<br/><br/>When every 🚀 ship has been destroyed the <strong>🚩 Flagships</strong> will drop their shields and attack each other directly.
+<br/><br/>If your own flagship dies, you lose; if the enemy flagship dies, you win!</p>
 <script type="text/javascript" src="canvasLoader.js"></script>
 <script type="text/javascript">
 
@@ -246,7 +271,7 @@ function gameLoop() {
       skillCooldown--;
     } else {
       var s= document.getElementById("statusSpan");
-      s.style="font-size: 20px; color: white"
+      s.style="font-size: 20px; color: #00FF00"
     }
     for(var i = 0; i < spriteObjects.length; i++){
       spriteObjects[i].runOncePerFrame();
@@ -911,7 +936,9 @@ function clickCanvas(x, y){
     drawLine(x, y, targetShip.x+targetShip.xOffset, targetShip.y+targetShip.yOffset, 10, "#FFB6C1")
     if(targetShip != rightFlagship){
       targetShip.takeDamage(20);
-      skillCooldown = 30;    
+      skillCooldown = 30;  
+      var s= document.getElementById("statusSpan");
+      s.style="font-size: 20px; color: #FF0000"  
     }
 
   } else {
