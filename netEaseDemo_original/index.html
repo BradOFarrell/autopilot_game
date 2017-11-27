@@ -1,0 +1,933 @@
+<html>
+  <head>
+    <title>Prototype</title>
+    <meta charset="utf-8" />
+
+    <style type="text/css">
+
+      #canvas{background-color: #000;}
+
+    </style>
+  </head>
+
+<body bgcolor="#000000" text="#FFFFFF" onLoad="startGame()">
+<p style="text-align: center;"><canvas id="gameSpace" width="2000" height="1000" style="border:1px solid #FFFFFF;">This game only works in modern browsers that support Canvas.</canvas></p>
+<p style="margin-left: auto; margin-right: auto; text-align: center"><span id='statusSpan' style="font-size: 40; color: white"></span></p>
+<script type="text/javascript" src="canvasLoader.js"></script>
+<script type="text/javascript">
+
+//-----------------------------------------------------------//
+// Global variables
+//-----------------------------------------------------------//
+
+var canvas;                      // The canvas object
+var ctx;                         // Context for the canvas
+var clickFunct;                  // To pass a function to the console loader
+var spriteObjects = new Array(); // An array that holds all generic objects
+var leftTeam = new Array();      // An array that holds all generic objects
+var leftFlagship;                // the flagship for the left
+var rightTeam = new Array();     // An array that holds all generic objects
+var rightFlagship;               // the flagship for the right
+var globalTicker = 0;            // A global clock
+var skillCooldown = 0;
+
+//-----------------------------------------------------------//
+// Main functions
+//-----------------------------------------------------------//
+
+function startGame(){
+  canvas = document.getElementById('gameSpace');
+  if (canvas.getContext) {
+    ctx = canvas.getContext("2d");
+  } else {
+    alert("This game only works in modern browsers that support Canvas.");
+  }
+  new spriteObj("", "spacebackground2", 0, 0, 1000, 2000, 0, false);
+/*
+//  Attacker ships:
+  new Cruisers("l", 1, 1);
+  new Tank("l", 1, 1);
+  new Mortar("l", 1, 1);
+  new Jammer("l", 1, 1);
+  new Hive("l", 1, 1);
+  new Flagship("l", 1, 1);
+
+//  Defender ships:
+  new Cruisers("r", 1, 5);
+  new Tank("r", 1, 5);
+  new Mortar("r", 1, 5);
+  new Jammer("r", 1, 5);
+  new Hive("r", 1, 5);
+  new Flagship("r", 1, 5);
+
+BLANK ATTACKER GRID (just input ship names)
+  new ("l", 1, 1);
+  new ("l", 2, 1);
+  new ("l", 3, 1);
+  new ("l", 4, 1);
+  new ("l", 1, 2);
+  new ("l", 2, 2);
+  new ("l", 3, 2);
+  new ("l", 4, 2);
+  new ("l", 1, 3);
+  new ("l", 2, 3);
+  new ("l", 3, 3);
+  new ("l", 4, 3);
+  new ("l", 1, 4);
+  new ("l", 2, 4);
+  new ("l", 3, 4);
+  new ("l", 4, 4);
+
+BLANK DEFENDER GRID (just input ship names)
+  new ("l", 1, 5);
+  new ("l", 2, 5);
+  new ("l", 3, 5);
+  new ("l", 4, 5);
+  new ("l", 1, 6);
+  new ("l", 2, 6);
+  new ("l", 3, 6);
+  new ("l", 4, 6);
+  new ("l", 1, 7);
+  new ("l", 2, 7);
+  new ("l", 3, 7);
+  new ("l", 4, 7);
+  new ("l", 1, 8);
+  new ("l", 2, 8);
+  new ("l", 3, 8);
+  new ("l", 4, 8);
+
+/  Attacker ships:
+  new Hive("l", 1, 1);
+  new Flagship("l", 2, 1);
+  new Hive("l", 3, 1);
+  new Mine("l", 2, 3);
+  new Jammer("l", 4, 1);
+  new Tank("l", 5, 3);
+  new Cruisers("l", 2, 2);
+  new Cruisers("l", 5, 2);
+
+//  Defender ships:
+  new Tank("r", 3, 5);
+  new Cruisers("r", 2, 7);
+  new Cruisers("r", 3, 6);
+  new Cruisers("r", 4, 7);
+  new Flagship("r", 5, 10);
+  new Tank("r", 2, 8);
+  new Mortar("r", 1, 8);
+  new Shield("r", 4, 9);
+
+//  Attacker ships:
+  new Flagship("l", 5, 1);
+  new Jammer("l", 1, 3);
+  new Jammer("l", 5, 3);
+  new Hive("l", 3, 4);
+  new Tank("l", 1, 4);
+  new Tank("l", 5, 4);
+  new Shield("l", 3, 5);
+
+
+//  Defender ships:
+  new Flagship("r", 3, 9);
+  new Mortar("r", 2, 7);
+  new Mortar("r", 4, 7);
+  new Tank("r", 2, 6);
+  new Tank("r", 4, 6);
+  new Arrow("r", 3, 10);
+  new Mine("r", 3, 7);
+
+//  Attacker ships:
+  new Flagship("l", 1, 1);
+  new Jammer("l", 1, 3);
+  new Jammer("l", 3, 3);
+  new Jammer("l", 5, 3);
+  new Tank("l", 1, 5);
+  new Tank("l", 5, 5);
+  new Shield("l", 3, 5);
+
+
+//  Defender ships:
+  new Flagship("r", 3, 10);
+  new Mortar("r", 2, 7);
+  new Mortar("r", 4, 7);
+  new Tank("r", 2, 6);
+  new Tank("r", 4, 6);
+  new Hive("r", 3, 9);
+  new Hive("r", 3, 8);
+
+
+//  Attacker ships:
+  new Flagship("l", 1, 1);
+  new Mortar("l", 1, 5);
+  new Mortar("l", 1, 3);
+  new Mortar("l", 5, 3);
+  new Shield("l", 2, 5);
+  new Shield("l", 4, 5);
+  new Arrow("l", 5, 1);
+
+//  Attacker ships:
+  new Flagship("l", 1, 1);
+  new Jammer("l", 1, 3);
+  new Jammer("l", 3, 3);
+  new Jammer("l", 5, 3);
+  new Tank("l", 1, 5);
+  new Tank("l", 5, 5);
+  new Shield("l", 3, 5);
+
+//  Attacker ships:
+  new Flagship("l", 1, 1);
+  new Mortar("l", 1, 5);
+  new Mortar("l", 1, 3);
+  new Mortar("l", 5, 3);
+  new Shield("l", 2, 5);
+  new Shield("l", 4, 5);
+  new Arrow("l", 5, 1);
+
+//  Defender ships:
+  new Flagship("r", 4, 10);
+  new Tank("r", 5, 8);
+  new Jammer("r", 5, 9);
+  new Shield("r", 4, 9);
+  new Shield("r", 3, 8);
+  new Mine("r", 2, 9);
+  new Tank("r", 2, 10);
+
+
+//  Attacker ships:
+  new Flagship("l", 5, 1);
+  new Mortar("l", 5, 2);
+  new Mortar("l", 5, 3);
+  new Tank("l", 1, 4);
+  new Tank("l", 3, 4);
+  new Shield("l", 2, 5);
+  new Shield("l", 4, 5);
+
+//  Defender ships:
+  new Flagship("r", 3, 10);
+  new Arrow("r", 2, 10);
+  new Hive("r", 2, 9);
+  new Shield("r", 2, 8);
+  new Arrow("r", 4, 10);
+  new Hive("r", 4, 9);
+  new Shield("r", 4, 8);
+  */
+
+//  Attacker ships:
+  new Hive("l", 2, 1);
+  new Flagship("l", 3, 1);
+  new Hive("l", 4, 1);
+  new Mine("l", 3, 3);
+  new Jammer("l", 4, 1);
+  new Cruisers("l", 1, 3);
+  new Cruisers("l", 5, 3);
+
+//  Defender ships:
+  new Tank("r", 3, 5);
+  new Cruisers("r", 2, 7);
+  new Cruisers("r", 3, 6);
+  new Cruisers("r", 4, 7);
+  new Flagship("r", 3, 10);
+  new Tank("r", 2, 8);
+  new Mortar("r", 1, 8);
+  new Arrow("r", 4, 9);
+  new Arrow("r", 2, 9);
+
+  setInterval(gameLoop, 50);
+}
+
+function gameLoop() {
+  CanvasLoader.clearCanvas();
+  if(skillCooldown == 0){
+    print("Click anywhere to attack enemy ships.");
+  } else {
+    print("Skill cooldown: "+skillCooldown);    
+  }
+    if(skillCooldown > 0){
+      skillCooldown--;
+    } else {
+      var s= document.getElementById("statusSpan");
+      s.style="font-size: 40; color: white"
+    }
+    for(var i = 0; i < spriteObjects.length; i++){
+      spriteObjects[i].runOncePerFrame();
+    }
+    for(var i = 0; i < leftTeam.length; i++){
+      if(leftTeam[i].slowCounter == 0){        
+        leftTeam[i].runOncePerFrame();
+      } else {
+        if(globalTicker % 2 == 0){
+          leftTeam[i].runOncePerFrame();
+        }
+        if(leftTeam[i].slowCounter > 0){
+          leftTeam[i].slowCounter--;          
+//          leftTeam[i].draw();          
+        }
+      }
+    }
+    for(var i = 0; i < rightTeam.length; i++){
+      if(rightTeam[i].slowCounter == 0){        
+        rightTeam[i].runOncePerFrame();
+      } else {
+        if(globalTicker % 2 == 0){
+          rightTeam[i].runOncePerFrame();
+        }
+        if(rightTeam[i].slowCounter > 0){
+         rightTeam[i].slowCounter--;
+//         rightTeam[i].draw();
+       }
+      }
+    }
+    globalTicker++;
+}
+
+//-------------------------------------------------
+// Helper Functions
+//-------------------------------------------------
+
+// Allows objects to extend from other objects
+function extendObj(subObj, superObj)
+{
+ for(sProperty in superObj)
+ {
+  subObj[sProperty] = superObj[sProperty];
+ }
+ var i = superObj.storedArray.indexOf(this);
+ superObj.storedArray.splice(i, 1);
+}
+
+function strURL(str){
+  return str.replace(/ /g,"").toLowerCase()
+}
+
+function print(str){
+  var s= document.getElementById("statusSpan");
+  s.innerHTML = str;
+}
+//-------------------------------------------------
+// Drawing objects
+//-------------------------------------------------
+
+function newShip(team, category, row, col, spriteArray){
+
+spriteArray.push(new spritebj("", "barrier", 400, 400, 200, 200, 0, false));
+return;
+}
+
+function Flagship(team, row, col){
+ extendObj(this, new spriteObj(team, "flagship", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 100;
+  this.speed = 0;
+  this.attackPower = 5;
+  this.defaultCooldown = 5;
+  // Damage output: 1.0 per frame, single shot
+
+  this.range = 240;
+  this.squadSize = 1;
+  this.doomsdayStart = false;
+
+  if(team == "l"){
+    leftFlagship = this;
+  } else if(team == "r") {
+    rightFlagship = this;
+  }
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+   if(this.laserAttack("#FFD700", 5)){
+    this.cooldown = this.defaultCooldown;
+   } else {
+    this.moveShip();
+   }
+  } else {
+    this.cooldown--;
+  }
+  if(leftFlagship.doomsdayStart && rightFlagship.doomsdayStart){
+    if(globalTicker%2 == 0){
+      this.takeDamage(1);
+      drawLine(leftFlagship.x+leftFlagship.xOffset+(globalTicker%4), leftFlagship.y+leftFlagship.yOffset+(globalTicker%2), rightFlagship.x+rightFlagship.xOffset+(globalTicker%4), rightFlagship.y+rightFlagship.yOffset+(globalTicker%3), 5+(globalTicker%4), "#FFD700")
+    }  
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+  this.onDeath = function(){
+    if(this === leftFlagship){
+      alert("You lose!")
+      location.reload();
+      } else if (this === rightFlagship){
+      alert("You win!")
+      location.reload();
+    }
+  }
+
+ this.sortTeam();
+}
+
+function Cruisers(team, row, col){
+ extendObj(this, new spriteObj(team, "cruisers", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 100;
+  this.speed = 4;
+  this.attackPower = 15;
+  this.defaultCooldown = 5;
+  // Damage output: 3.0 per frame, single shot
+
+  this.squadSize = 2;
+  this.range = 240;
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+   if(this.laserAttack("#00FF00", 10)){
+    this.cooldown = this.defaultCooldown;
+   }
+  } else {
+    this.cooldown--;
+  }
+  this.moveShip();
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+
+function Arrow(team, row, col){
+ extendObj(this, new spriteObj(team, "arrow", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 100;
+  this.speed = 6;
+  this.attackPower = 15;
+  this.defaultCooldown = 5;
+  // Damage output: 3.0 per frame, single shot
+
+  this.startYet = false
+  this.squadSize = 1;
+  this.range = 240;
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+   if(this.laserAttack("#00FF00", 10)){
+    this.cooldown = this.defaultCooldown;
+    this.startYet = true;
+    this.blinkCounter = 0
+   }
+  } else {
+    this.cooldown--;
+  }
+  if(this.startYet){
+    this.moveShip();    
+  }
+  if(globalTicker == 100){
+  this.blinkCounter = 100
+  }
+  if(globalTicker == 200){
+  this.startYet = true;
+  this.blinkCounter = 0
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+function Shield(team, row, col){
+ extendObj(this, new spriteObj(team, "shield", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 200;
+  this.speed = 0;
+  this.attackPower = 1;
+  // Damage output: 0.33 per frame, plus slow, AOE around self (Bomb Tower)
+
+
+  this.squadSize = 1;
+  this.range = 240;
+
+  this.runOncePerFrame = function (){
+
+   drawCircle(this.x+this.xOffset, this.y+this.yOffset, (this.range*0.6)+(globalTicker%2), "none", "#ffffff")
+   drawCircle(this.x+this.xOffset, this.y+this.yOffset, (this.range*0.8)+(globalTicker%2), "none", "#a0daff")
+   drawCircle(this.x+this.xOffset, this.y+this.yOffset, this.range, "none", "#ffffff")
+  if(globalTicker % 3 == 0){
+      jammerAttack(this.x+this.xOffset, this.y+this.yOffset, this.range, 1, "none", "#a0daff", this.targetArray)
+  }
+  if(globalTicker % 5 == 0){
+    this.hp--;
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+function Mortar(team, row, col){
+ extendObj(this, new spriteObj(team, "mortar", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 100;
+  this.speed = 2;
+  this.attackPower = 30;
+  this.defaultCooldown = 60;
+  // Damage output: 0.66 per frame, AOE
+
+  this.squadSize = 1;
+  this.range = 240;
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+  var findTarget = targetClosestShip(this.x+this.xOffset, this.y+this.yOffset, this.range, this.targetArray)
+   if(findTarget){
+    drawLine(this.x+this.xOffset, this.y+this.yOffset, findTarget.x+findTarget.xOffset, findTarget.y+findTarget.yOffset, 30,"#FF0000")
+    damageShipsAOE(findTarget.x+findTarget.xOffset, findTarget.y+findTarget.yOffset, 210, this.attackPower, "#FF0000", "#660000", this.targetArray)
+    this.cooldown = this.defaultCooldown;
+   } else {
+    this.moveShip();
+   }
+  } else {
+    this.cooldown--;
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+
+function Jammer(team, row, col){
+ extendObj(this, new spriteObj(team, "jammer", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 60;
+  this.speed = 8;
+  this.attackPower = 5;
+  this.defaultCooldown = 25;
+  // Damage output: 0.20 per frame, plus slow status
+
+  this.range = 240;
+  this.squadSize = 1;
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+  var findTarget = targetClosestShip(this.x+this.xOffset, this.y+this.yOffset, this.range, this.targetArray)
+   if(findTarget){
+    drawLine(this.x+this.xOffset, this.y+this.yOffset, findTarget.x+findTarget.xOffset, findTarget.y+findTarget.yOffset, 10,"#a0daff")
+    jammerAttack(findTarget.x+findTarget.xOffset, findTarget.y+findTarget.yOffset, 200, this.attackPower, "none", "#a0daff", this.targetArray)
+    this.cooldown = this.defaultCooldown;
+   } else {
+    this.moveShip();
+   }
+  } else {
+    this.cooldown--;
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+function Drones(team, row, col){
+ extendObj(this, new spriteObj(team, "drones", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 60;
+  this.speed = 8;
+  this.attackPower = 15;
+  // Damage output: 15 AOE on death, or half of HP to flagship if reaches endzone
+
+  this.squadSize = 3;
+  this.range = 240;
+
+  this.runOncePerFrame = function (){
+    this.moveShip();
+    this.draw();
+    this.drawHP();
+   }
+
+  this.onDeath = function (){
+    damageShipsAOE(this.x+this.xOffset, this.y+this.yOffset, this.range, this.attackPower, "#660000", "#FF0000", this.targetArray)
+   }
+
+ this.sortTeam();
+}
+
+function Tank(team, row, col){
+ extendObj(this, new spriteObj(team, "tank", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 150;
+  this.speed = 2;
+  this.attackPower = 25;
+  this.defaultCooldown = 30;
+  // Damage output: 0.83 per frame, single shot
+
+  this.squadSize = 1;
+  this.range = 240;
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+   if(this.laserAttack("#FFFFFF", 40)){
+    this.cooldown = this.defaultCooldown;
+   } else {
+    this.moveShip();
+   }
+  } else {
+    this.cooldown--;
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+function Hive(team, row, col){
+ extendObj(this, new spriteObj(team, "hive", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 100;
+  this.speed = 0;
+
+  this.squadSize = 1;
+  this.defaultCooldown = 100;
+
+  this.runOncePerFrame = function (){
+  if(this.cooldown == 0){
+    new Drones(this.team,  (this.y/200)+1, (this.x/200)+1)
+    this.takeDamage(25);
+    this.cooldown = this.defaultCooldown;
+  } else {
+    this.cooldown--;
+  }
+  this.draw();
+  this.drawHP();
+  }
+
+ this.sortTeam();
+}
+
+function Mine(team, row, col){
+ extendObj(this, new spriteObj(team, "mine", ((col-1)*200), ((row-1)*200), 200, 200, 0, false));
+  this.hp = 100;
+  this.speed = 0;
+  this.range = 240;
+  this.attackPower = 20;
+
+  this.squadSize = 1;
+  this.defaultCooldown = 10;
+
+  this.runOncePerFrame = function (){
+  var findTarget = targetClosestShip(this.x+this.xOffset, this.y+this.yOffset, this.range, this.targetArray)
+    if(findTarget){
+    this.takeDamage(100);      
+    }
+    if(globalTicker % 5 == 0){
+    this.hp--;
+      if(this.hp < 50){
+        this.blinkCounter = 100;      
+      }
+    }
+  this.draw();
+  this.drawHP();
+  }
+
+  this.onDeath = function (){
+    jammerAttack(this.x+this.xOffset, this.y+this.yOffset, 420, this.attackPower, "#a0daff", "#ffffff", this.targetArray)
+    new Drones(this.team,  (this.y/200)+0.5, (this.x/200)+1)
+    new Drones(this.team,  (this.y/200)+1.5, (this.x/200)+1)
+  }
+
+ this.sortTeam();
+}
+
+function spriteObj(team, category, x, y, h, w, l, offSet){
+  // category: spacebackground, explosion;
+  this.team = team;
+  this.img = createImage(team+"_"+category+".png");
+  this.x = x;
+  this.y = y;
+  this.height = h;
+  this.width = w;
+  this.frameLimit = l;
+  this.useOffset = offSet;
+
+  this.storedArray = spriteObjects;
+  this.targetArray = spriteObjects;
+  this.frame = 0;
+  this.speed = 2;
+  this.frameWidth = this.width * this.frame;
+  this.xOffset = this.width/2;
+  this.yOffset = this.height/2;
+  this.onBlink = true;
+  this.blinkCounter = 0;
+  this.alive = true;
+
+  this.hp = 100;
+  this.showHP = true;
+  this.slowCounter = 0;
+
+  this.defaultCooldown = 20;
+  this.cooldown = 0;
+  this.squadSize = 1;
+  this.range = 220;
+  this.attackPower = 20;
+
+  this.draw = function (){
+   var blinkOffset = (this.blinkCounter % 2) * 3
+  if(this.blinkCounter > 0){
+
+   this.blinkCounter--;
+  }
+//print(blinkOffset)
+
+  if(this.onBlink && this.alive){
+   if(this.useOffset){
+    ctx.drawImage(this.img, 0 + (this.width * this.frame), 0, this.width, this.height, (this.x+blinkOffset - this.xOffset), (this.y+blinkOffset - this.yOffset), this.width, this.height);      
+   }
+   else{
+    ctx.drawImage(this.img, 0 + (this.width * this.frame), 0, this.width, this.height, (this.x+blinkOffset), (this.y+blinkOffset), this.width, this.height);
+      }
+    }  
+    this.nextFrame();
+  }
+
+  this.drawHP = function(){
+      ctx.font = "30px serif";
+    if(this.slowCounter == 0){
+      if(this.hp <= 20){
+        ctx.fillStyle = '#ff0000';
+        ctx.strokeStyle = '#550000';
+      } else if (this.hp <= 50 && this.hp > 20){
+        ctx.fillStyle = '#FFA500';
+        ctx.strokeStyle = '#553300';
+      } else if (this.hp > 50){
+        ctx.fillStyle = '#00ff00';
+        ctx.strokeStyle = '#005500';
+      }
+    } else {
+        ctx.fillStyle = '#a0daff';
+        ctx.strokeStyle = '#000033';      
+    }
+    ctx.lineWidth=4;
+    this.checkDeath();
+    ctx.strokeText("["+this.hp+" hp]", this.x+(this.xOffset/2), this.y+(this.yOffset*2));
+    ctx.fillText("["+this.hp+" hp]", this.x+(this.xOffset/2)+1, this.y+(this.yOffset*2)-2);
+  }
+
+  this.runOncePerFrame = function (){
+   this.draw();
+ }
+
+  this.checkDeath = function(){
+    var newArray
+    if(this.hp <= 0){
+      this.onDeath();
+      new spriteObj("", "explosion", this.x+this.xOffset, this.y+this.yOffset, 100,100, 16, true);
+      var i = this.storedArray.indexOf(this);
+      this.storedArray.splice(i, 1);
+      if(this.storedArray.length == 1){
+        if(this.team == "r"){
+          rightFlagship.doomsdayStart = true;
+        } else {
+          leftFlagship.doomsdayStart = true;
+        }
+      }
+    }
+  }
+
+ this.onDeath = function(){
+  return
+ }
+
+  this.nextFrame = function (){
+    if(this.frame != this.frameLimit){
+      this.frame++
+      }
+     if(this.frameLimit != 0 && this.frame == 0){
+      var i = this.storedArray.indexOf(this);
+      this.storedArray.splice(i, 1);
+     }
+    }
+
+  this.takeDamage = function(damage){
+    this.hp -= damage;
+    this.blinkCounter = 10
+ //   this.inspect();
+  }
+
+//  this.inspect = function(){
+//  }
+
+
+  this.laserAttack = function(color, size){
+  var findTarget = targetClosestShip(this.x+this.xOffset, this.y+this.yOffset, this.range, this.targetArray)
+  if(findTarget){
+    findTarget.takeDamage(this.attackPower);
+    drawLine(this.x+this.xOffset, this.y+this.yOffset, findTarget.x+findTarget.xOffset, findTarget.y+findTarget.yOffset, size, color)
+    return true;
+    } else {
+      return false;
+    }
+  }
+
+  this.moveShip = function(){
+    var tooClose = false;
+    if(this.team == "l"){
+       this.x+=this.speed*2;        
+    } else if (this.team == "r"){
+       this.x-=this.speed*2;        
+    }
+    if(this.x < 0){
+      leftFlagship.takeDamage(Math.floor(this.hp/2))
+      this.hp = 0;
+    } else if(this.x > 2000) {
+      rightFlagship.takeDamage(Math.floor(this.hp/2))
+      this.hp = 0;
+    }
+  }
+
+  this.sortTeam = function(){
+    if(this.team == "l"){
+      leftTeam.push(this);
+      this.storedArray = leftTeam;
+      this.targetArray = rightTeam;
+    } else if (this.team == "r"){
+      rightTeam.push(this);
+      this.storedArray = rightTeam;
+      this.targetArray = leftTeam;
+    } else {
+      spriteObjects.push(this);
+      this.storedArray = spriteObjects;
+    }
+  }
+
+ this.sortTeam();
+}
+
+function drawCircle(x, y, radius, color1, color2){
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+  ctx.fillStyle = color1;
+  if(color1 != "none"){ // color1 can be "none" for an empty circle
+    ctx.fill();        
+  }
+  ctx.strokeStyle = color2;
+  ctx.lineWidth = 5;
+  ctx.stroke();
+}
+
+function drawLine(x1, y1, x2, y2, width, color){
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+}
+
+function damageShipsAOE(targetX, targetY, radius, damage, color1, color2, targetTeam){
+    if(targetTeam.length > 0) {
+        drawCircle(targetX, targetY, radius, color1, color2);
+        var radsq = radius * radius;
+        for(var i = 0; i < targetTeam.length; i++) {
+            var ship = targetTeam[i];
+            var dx = (ship.x + ship.xOffset) - targetX;
+            var dy = (ship.y + ship.yOffset) - targetY;
+            if((dx * dx + dy * dy) < radsq) {
+                ship.takeDamage(damage * ship.squadSize);
+            }
+        }
+    }
+}
+
+function jammerAttack(targetX, targetY, radius, damage, color1, color2, targetTeam){
+    if(targetTeam.length > 0) {
+        drawCircle(targetX, targetY, radius, color1, color2);
+        var radsq = radius * radius;
+        for(var i = 0; i < targetTeam.length; i++) {
+            var ship = targetTeam[i];
+            var dx = (ship.x + ship.xOffset) - targetX;
+            var dy = (ship.y + ship.yOffset) - targetY;
+            if((dx * dx + dy * dy) < radsq) {
+                ship.slowCounter = 30;
+                ship.takeDamage(damage * ship.squadSize);
+            }
+        }
+    }
+}
+
+function getDistance(x1, y1, x2, y2){
+  return Math.sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+}
+
+// Searches all the ships in a circle, returns the closest ship
+function targetClosestShip(targetX, targetY, radius, targetTeam){
+  var shipsInRange = new Array();
+  var closestShip = false;
+  var closestDistance;
+  var newDistance;
+  //alert(targetX + " " + targetY + " ")
+  if(targetTeam.length > 0){
+    for(var i = 0; i < targetTeam.length; i++){
+      if(Math.pow((targetTeam[i].x+(targetTeam[i].xOffset)-targetX),2) + Math.pow((targetTeam[i].y+(targetTeam[i].yOffset)-targetY),2) < Math.pow(radius,2)){
+        shipsInRange.push(targetTeam[i])
+      }
+    }
+//    alert(targetX + " " + targetY + " " + targetTeam)
+    if (shipsInRange.length > 0){
+    closestShip = shipsInRange[0]
+    closestDistance = getDistance(targetX, targetY, closestShip.x+closestShip.xOffset, closestShip.y+closestShip.yOffset)
+    for(var i = 0; i < shipsInRange.length; i++){
+      newDistance = getDistance(targetX, targetY, shipsInRange[i].x+shipsInRange[i].xOffset, shipsInRange[i].y+shipsInRange[i].yOffset);
+      if(newDistance < closestDistance) {
+        closestDistance = newDistance;
+        closestShip = shipsInRange[i];
+      }
+     }
+    }    
+  }
+
+  if(closestShip && typeof closestShip != "undefined"){
+    return closestShip;
+  } else {
+    return false;
+  }
+}
+
+//    closestShip.takeDamage(64);
+//  drawLine(targetX, targetY, closestShip.x+closestShip.xOffset, closestShip.y+closestShip.yOffset,"#00FF00")
+
+//-------------------------------------------------
+// Click Function
+//-------------------------------------------------
+
+//Sends the function to the canvas loader
+clickFunct = function(x, y){
+    clickCanvas(x, y) 
+  }
+CanvasLoader.setClickFunction(clickFunct)
+
+function clickCanvas(x, y){
+  var targetShip = false;
+//  spriteObjects.push(new spriteObj("", ""+strURL(getRandomWarrior())+"", x, y, 200, 200, 0, true));
+  if(skillCooldown == 0){
+    new spriteObj("", "explosion", x, y, 100, 100, 16, true);
+//    damageShipsAOE(x, y, 200, 35, "none", "#FF0000", rightTeam);
+//    drawCircle(x, y, 200, "none", "#00FF00");
+    targetShip = targetClosestShip(x, y, 3000, rightTeam);
+
+    drawLine(x, y, targetShip.x+targetShip.xOffset, targetShip.y+targetShip.yOffset, 10, "#FFB6C1")
+
+    if(targetShip != rightFlagship){
+      targetShip.takeDamage(20);
+      skillCooldown = 30;    
+    }
+
+  } else {
+    var s= document.getElementById("statusSpan");
+    s.style="font-size: 40; color: red"
+  }
+}
+
+function createImage(newSrc) {  
+  var newImg = new Image();
+  newImg.src = newSrc;
+  return newImg;
+}
+
+
+
+</script>
+</body>
+</html> 
