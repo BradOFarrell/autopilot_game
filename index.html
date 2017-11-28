@@ -238,24 +238,23 @@ BLANK DEFENDER GRID (just input ship names)
   */
 
 //  Attacker ships:
-  new Hive("l", 1, 1);
-  new Mine("l", 2, 1);
-  new Mine("l", 4, 1);
   new Flagship("l", 3, 1);
-  new Mine("l", 3, 2);
-  new Jammer("l", 3, 3);
-  new Cruisers("l", 1, 3);
-  new Cruisers("l", 5, 3);
+  new Jammer("l", 1, 1);
+  new Mine("l", 2, 2);
+  new Mine("l", 4, 2);
+  new Tank("l", 3, 2);
+  new Cruisers("l", 3, 3);
+  new Jammer("l", 5, 1);
 
 //  Defender ships:
-  new Cruisers("r", 2, 8);
-  new Cruisers("r", 3, 9);
-  new Cruisers("r", 4, 8);
+  new Shield("r", 3, 9);
   new Flagship("r", 3, 10);
-  new Mortar("r", 1, 8);
+  new Mortar("r", 3, 8);
   new Arrow("r", 4, 9);
   new Arrow("r", 2, 9);
   new Hive("r", 5, 10);
+  new Hive("r", 1, 10);
+
   
   setInterval(gameLoop, 50);
 }
@@ -346,7 +345,7 @@ function Flagship(team, row, col){
   this.defaultCooldown = 5;
   // Damage output: 1.0 per frame, single shot
 
-  this.range = 240;
+  this.range = 120;
   this.squadSize = 1;
   this.doomsdayStart = false;
 
@@ -377,13 +376,15 @@ function Flagship(team, row, col){
   }
 
   this.onDeath = function(){
-    if(this === leftFlagship){
+    setTimeout(()=>{
+      if(this === leftFlagship){
       alert("You lose!")
       location.reload();
       } else if (this === rightFlagship){
       alert("You win!")
       location.reload();
     }
+    },200);
   }
 
  this.sortTeam();
@@ -398,7 +399,7 @@ function Cruisers(team, row, col){
   // Damage output: 3.0 per frame, single shot
 
   this.squadSize = 2;
-  this.range = 240;
+  this.range = 120;
 
   this.runOncePerFrame = function (){
   if(this.cooldown == 0){
@@ -427,7 +428,7 @@ function Arrow(team, row, col){
 
   this.startYet = false
   this.squadSize = 1;
-  this.range = 240;
+  this.range = 120;
 
   this.runOncePerFrame = function (){
   if(this.cooldown == 0){
@@ -494,7 +495,7 @@ function Mortar(team, row, col){
   // Damage output: 0.66 per frame, AOE
 
   this.squadSize = 1;
-  this.range = 240;
+  this.range = 120;
 
   this.runOncePerFrame = function (){
   if(this.cooldown == 0){
@@ -525,7 +526,7 @@ function Jammer(team, row, col){
   this.defaultCooldown = 25;
   // Damage output: 0.20 per frame, plus slow status
 
-  this.range = 240;
+  this.range = 120;
   this.squadSize = 1;
 
   this.runOncePerFrame = function (){
@@ -556,7 +557,7 @@ function Drones(team, row, col){
   // Damage output: 15 AOE on death, or half of HP to flagship if reaches endzone
 
   this.squadSize = 3;
-  this.range = 240;
+  this.range = 120;
 
   this.runOncePerFrame = function (){
     this.moveShip();
@@ -580,7 +581,7 @@ function Tank(team, row, col){
   // Damage output: 0.83 per frame, single shot
 
   this.squadSize = 1;
-  this.range = 240;
+  this.range = 120;
 
   this.runOncePerFrame = function (){
   if(this.cooldown == 0){
@@ -626,7 +627,7 @@ function Mine(team, row, col){
  extendObj(this, new spriteObj(team, "mine", ((col-1)*100), ((row-1)*100), 100, 100, 0, false));
   this.hp = 100;
   this.speed = 0;
-  this.range = 240;
+  this.range = 120;
   this.attackPower = 20;
 
   this.squadSize = 1;
@@ -685,7 +686,7 @@ function spriteObj(team, category, x, y, h, w, l, offSet){
   this.defaultCooldown = 20;
   this.cooldown = 0;
   this.squadSize = 1;
-  this.range = 220;
+  this.range = 120;
   this.attackPower = 20;
 
   this.draw = function (){
@@ -929,13 +930,15 @@ function clickCanvas(x, y){
 //  spriteObjects.push(new spriteObj("", ""+strURL(getRandomWarrior())+"", x, y, 100, 100, 0, true));
   if(skillCooldown == 0){
     new spriteObj("", "explosion", x, y, 100, 100, 16, true);
-    damageShipsAOE(x, y, 100, 35, "none", "#FF0000", rightTeam);
-    drawCircle(x, y, 100, "none", "#00FF00");
+    drawCircle(x, y, 75, "none", "#FFD700");
+    drawCircle(x, y, 100, "none", "#FFD700");
+    drawCircle(x, y, 125, "none", "#FFD700");
     targetShip = targetClosestShip(x, y, 3000, rightTeam);
 
-    drawLine(x, y, targetShip.x+targetShip.xOffset, targetShip.y+targetShip.yOffset, 10, "#FFB6C1")
+
+    drawLine(leftFlagship.x+leftFlagship.xOffset, leftFlagship.y+leftFlagship.yOffset, targetShip.x+targetShip.xOffset, targetShip.y+targetShip.yOffset, 10, "#FFD700")
     if(targetShip != rightFlagship){
-      targetShip.takeDamage(20);
+      targetShip.takeDamage(25);
       skillCooldown = 30;  
       var s= document.getElementById("statusSpan");
       s.style="font-size: 20px; color: #FF0000"  
